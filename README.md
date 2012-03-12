@@ -13,33 +13,33 @@ That's where this script comes in.
 
 ### Example
 Given an implementation file:
+```objc
+// This one should be included
+NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
+// This one should not be
+static NSString * const kIsStatic = @"Static String";
+// This one should be included
+NSInteger const kConstantInteger = 50;
+// This one should not
+NSInteger globalInteger = 0;
 
-    // This one should be included
-    NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
+@implementation SampleConstants
+
+// Technically these are top-level decls too
+// This one should be included
+NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
+
+- (id) init
+{
+    self = [super init];
     // This one should not be
-    static NSString * const kIsStatic = @"Static String";
-    // This one should be included
-    NSInteger const kConstantInteger = 50;
-    // This one should not
-    NSInteger globalInteger = 0;
-    
-    @implementation SampleConstants
-    
-    // Technically these are top-level decls too
-    // This one should be included
-    NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
-    
-    - (id) init
-    {
-        self = [super init];
-        // This one should not be
-        NSString * const kThisShouldntBeParsed = @"This shouldn't be parsed";
-        NSLog(@"%@", kThisShouldntBeParsed);
-        return self;
-    }
-    
-    @end
+    NSString * const kThisShouldntBeParsed = @"This shouldn't be parsed";
+    NSLog(@"%@", kThisShouldntBeParsed);
+    return self;
+}
 
+@end
+```
 And a header file:
     #import <Foundation/Foundation.h>
     
