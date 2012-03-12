@@ -13,6 +13,7 @@ That's where this script comes in.
 
 ### Example
 Given an implementation file:
+
 ``` objective-c
 // This one should be included
 NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
@@ -40,7 +41,9 @@ NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
 
 @end
 ```
+
 And a header file:
+
 ``` objective-c
 #import <Foundation/Foundation.h>
 
@@ -51,7 +54,9 @@ And a header file:
 
 @end
 ```
+
 Generates in the header file:
+
 ``` objective-c
 #import <Foundation/Foundation.h>
 
@@ -65,6 +70,7 @@ extern NSString* const kInsideImplementationBlock;
 
 @end
 ```
+
 ### TODOs
 1. Fix static constants being picked up as externs.  I still have to work out how clang parses "static"-ness.
 2. Fix the hardcoded -framework Foundation argument being passed to libclang.
