@@ -13,33 +13,33 @@ That's where this script comes in.
 
 ### Example
 Given an implementation file:
-```objc
-// This one should be included
-NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
-// This one should not be
-static NSString * const kIsStatic = @"Static String";
-// This one should be included
-NSInteger const kConstantInteger = 50;
-// This one should not
-NSInteger globalInteger = 0;
 
-@implementation SampleConstants
-
-// Technically these are top-level decls too
-// This one should be included
-NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
-
-- (id) init
-{
-    self = [super init];
+    // This one should be included
+    NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
     // This one should not be
-    NSString * const kThisShouldntBeParsed = @"This shouldn't be parsed";
-    NSLog(@"%@", kThisShouldntBeParsed);
-    return self;
-}
+    static NSString * const kIsStatic = @"Static String";
+    // This one should be included
+    NSInteger const kConstantInteger = 50;
+    // This one should not
+    NSInteger globalInteger = 0;
+    
+    @implementation SampleConstants
+    
+    // Technically these are top-level decls too
+    // This one should be included
+    NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
+    
+    - (id) init
+    {
+        self = [super init];
+        // This one should not be
+        NSString * const kThisShouldntBeParsed = @"This shouldn't be parsed";
+        NSLog(@"%@", kThisShouldntBeParsed);
+        return self;
+    }
+    
+    @end
 
-@end
-```
 And a header file:
     #import <Foundation/Foundation.h>
     
@@ -62,3 +62,10 @@ Generates in the header file:
     @interface SampleConstants : NSObject
     
     @end
+    
+### TODOs
+1. Fix static constants being picked up as externs.  I still have to work out how clang parses "static"-ness.
+2. Fix the hardcoded -framework Foundation argument being passed to libclang.
+3. Find a better way to determine where libclang.dylib is on the system.  Right now it will only work if Xcode.app is installed into /Applications.
+4. Fix compatibility with standard C (fixing 2 will help).
+5. Fix compatibility with C++.
