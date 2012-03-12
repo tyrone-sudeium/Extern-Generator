@@ -13,56 +13,58 @@ That's where this script comes in.
 
 ### Example
 Given an implementation file:
+``` objective-c
+// This one should be included
+NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
+// This one should not be
+static NSString * const kIsStatic = @"Static String";
+// This one should be included
+NSInteger const kConstantInteger = 50;
+// This one should not
+NSInteger globalInteger = 0;
 
-    // This one should be included
-    NSString * const kOutsideImplementationBlock = @"Outside Implementation Block";
+@implementation SampleConstants
+
+// Technically these are top-level decls too
+// This one should be included
+NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
+
+- (id) init
+{
+    self = [super init];
     // This one should not be
-    static NSString * const kIsStatic = @"Static String";
-    // This one should be included
-    NSInteger const kConstantInteger = 50;
-    // This one should not
-    NSInteger globalInteger = 0;
-    
-    @implementation SampleConstants
-    
-    // Technically these are top-level decls too
-    // This one should be included
-    NSString * const kInsideImplementationBlock = @"Inside Implementation Block";
-    
-    - (id) init
-    {
-        self = [super init];
-        // This one should not be
-        NSString * const kThisShouldntBeParsed = @"This shouldn't be parsed";
-        NSLog(@"%@", kThisShouldntBeParsed);
-        return self;
-    }
-    
-    @end
+    NSString * const kThisShouldntBeParsed = @"This shouldn't be parsed";
+    NSLog(@"%@", kThisShouldntBeParsed);
+    return self;
+}
 
+@end
+```
 And a header file:
-    #import <Foundation/Foundation.h>
-    
-    #pragma GenerateHeaderExterns Begin
-    #pragma GenerateHeaderExterns End
-    
-    @interface SampleConstants : NSObject
-    
-    @end
+``` objective-c
+#import <Foundation/Foundation.h>
 
+#pragma GenerateHeaderExterns Begin
+#pragma GenerateHeaderExterns End
+
+@interface SampleConstants : NSObject
+
+@end
+```
 Generates in the header file:
-    #import <Foundation/Foundation.h>
-    
-    #pragma GenerateHeaderExterns Begin
-    extern NSString* const kOutsideImplementationBlock;
-    extern NSInteger const kConstantInteger;
-    extern NSString* const kInsideImplementationBlock;
-    #pragma GenerateHeaderExterns End
-    
-    @interface SampleConstants : NSObject
-    
-    @end
-    
+``` objective-c
+#import <Foundation/Foundation.h>
+
+#pragma GenerateHeaderExterns Begin
+extern NSString* const kOutsideImplementationBlock;
+extern NSInteger const kConstantInteger;
+extern NSString* const kInsideImplementationBlock;
+#pragma GenerateHeaderExterns End
+
+@interface SampleConstants : NSObject
+
+@end
+```
 ### TODOs
 1. Fix static constants being picked up as externs.  I still have to work out how clang parses "static"-ness.
 2. Fix the hardcoded -framework Foundation argument being passed to libclang.
