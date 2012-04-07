@@ -70,11 +70,15 @@ def insert_externs_into_header(headerfile, externs):
 	for line in readfile:
 		if not insideblock:
 			writefile.write(line)
-		if line.strip() == header_externs_begin:
+		if line.strip().lower() == header_externs_begin:
+			if debug and not insideblock:
+				dprint("found %s" % header_externs_begin)
 			insideblock = True
 			writefile.write('\n'.join(externs))
 			writefile.write('\n')
-		elif line.strip() == header_externs_end:
+		elif line.strip().lower() == header_externs_end:
+			if debug and insideblock:
+				dprint("found %s" % header_externs_end)
 			insideblock = False
 			writefile.write(line)
 	readfile.close()
@@ -96,6 +100,7 @@ def insert_externs_into_header(headerfile, externs):
 
 
 def extract_symbols_for_file(filename):
+	dprint("opened: %s" % filename)
 	externs = []
 	clang_indexer = cindex.Index.create()
 	tu = clang_indexer.parse(filename, ["-framework=Foundation"])
@@ -104,6 +109,7 @@ def extract_symbols_for_file(filename):
 			if (node.location.file.name == filename) and node.type.is_const_qualified():
 				externs.append(emit_extern_for_symbol(node))
 	filename, fileExt = os.path.splitext(filename)
+	dprint("externs for %s: \n%s" % (filename, " ".join(externs)))
 	insert_externs_into_header(filename + ".h", externs)
 
 def has_file_updated(filename, db):
@@ -126,7 +132,7 @@ def main():
 	filelist = filter(lambda s: s and not s.startswith("--"), sys.argv[1:])
 	for filename in filelist:
 		if has_file_updated(filename, db):
-			extract_symbols_for_file(sys.argv[1])
+			extract_symbols_for_file(filename)
 		else:
 			dprint("skipping file: %s" % filename)
 
