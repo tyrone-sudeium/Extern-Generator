@@ -70,11 +70,11 @@ def insert_externs_into_header(headerfile, externs):
 	for line in readfile:
 		if not insideblock:
 			writefile.write(line)
-		if line.strip() == header_externs_begin:
+		if line.strip().lower() == header_externs_begin:
 			insideblock = True
 			writefile.write('\n'.join(externs))
 			writefile.write('\n')
-		elif line.strip() == header_externs_end:
+		elif line.strip().lower() == header_externs_end:
 			insideblock = False
 			writefile.write(line)
 	readfile.close()
