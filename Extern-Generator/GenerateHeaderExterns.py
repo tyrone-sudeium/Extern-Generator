@@ -38,6 +38,36 @@ def print_nodes_recursive(node, depth):
 	for child in node.get_children():
 		print_nodes_recursive(child, depth+1)
 
+type_kind_names = {
+	cindex.TypeKind.BOOL: "bool",
+	cindex.TypeKind.CHAR_U: "char",
+	cindex.TypeKind.UCHAR: "unsigned char",
+	cindex.TypeKind.CHAR16: "short",
+	cindex.TypeKind.CHAR32: "int",
+	cindex.TypeKind.USHORT: "unsigned short",
+	cindex.TypeKind.UINT: "unsigned int",
+	cindex.TypeKind.ULONG: "unsigned long",
+	cindex.TypeKind.ULONGLONG: "unsigned long long",
+	cindex.TypeKind.UINT128: "__uint128_t",
+	cindex.TypeKind.CHAR_S: "char",
+	cindex.TypeKind.SCHAR: "char",
+	cindex.TypeKind.WCHAR: "char",
+	cindex.TypeKind.SHORT: "short",
+	cindex.TypeKind.INT: "int",
+	cindex.TypeKind.LONG: "long",
+	cindex.TypeKind.LONGLONG: "long long",
+	cindex.TypeKind.INT128: "__int128_t",
+	cindex.TypeKind.FLOAT: "float",
+	cindex.TypeKind.DOUBLE: "double",
+	cindex.TypeKind.LONGDOUBLE: "long double",
+	cindex.TypeKind.OBJCID: "id",
+	cindex.TypeKind.OBJCCLASS: "Class",
+	cindex.TypeKind.OBJCSEL: "SEL"
+}
+
+def typename_for_symbol(node):
+	return type_kind_names[node.type.kind]
+
 def emit_extern_for_symbol(node):
 	typedef = "extern "
 	nodetype = node.type
@@ -50,13 +80,21 @@ def emit_extern_for_symbol(node):
 		decl = nodetype.get_declaration()
 		if (decl.kind == cindex.CursorKind.NO_DECL_FOUND):
 			# Primitive type: These are annoying
-			typedef = typedef + "todotype "
+			typedef = typedef + typename_for_symbol(node) + " "
 		else:
 			typedef = typedef + decl.spelling + " "
 	if nodetype.is_const_qualified():
 		typedef = typedef + "const "
 	typedef = typedef + node.displayname + ';'
 	return typedef
+
+def node_is_constant(node):
+	if (node.type.is_const_qualified):
+		return True
+	elif (node.type.kind == TypeKind.CONSTANTARRAY):
+		return True
+	else:
+		return False
 
 def insert_externs_into_header(headerfile, externs):
 	tmpfile = headerfile + ".tmp"
